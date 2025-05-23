@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>VCS Learning Management System</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #f5f7fa;
+    }
+    .page {
+      display: none;
+      flex: 1;
+      padding: 20px;
+    }
+    .active-page {
+      display: block;
+    }
+    .nav-link {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .nav-link:hover {
+      transform: translateY(-2px);
+      color: #fff !important;
+    }
+    .course-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      height: 100%;
+      border: none;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .course-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .course-img {
+      height: 180px;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .course-card:hover .course-img {
+      transform: scale(1.05);
+    }
+    .progress-container {
+      width: 100px;
+      height: 100px;
+      position: relative;
+      margin: 0 auto;
+    }
+    .progress-circle {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: conic-gradient(#28a745 var(--progress), #e9ecef 0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: bold;
+      color: #28a745;
+    }
+    #certificate {
+      width: 100%;
+      max-width: 800px;
+      height: auto;
+      padding: 50px;
+      text-align: center;
+      border: 15px solid #28a745;
+      margin: 20px auto;
+      background-color: #fff;
+      background-image: url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1473&q=80');
+      background-size: cover;
+      background-blend-mode: overlay;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    footer {
+      background-color: #28a745;
+      padding: 30px 0;
+      text-align: center;
+      margin-top: auto;
+      color: white;
+    }
+    footer a {
+      margin: 0 15px;
+      color: white;
+      font-size: 1.5rem;
+      transition: all 0.3s ease;
+    }
+    footer a:hover {
+      color: #f8f9fa;
+      transform: translateY(-3px);
+    }
+    .badge-category {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 0.8rem;
+      background-color: #28a745 !important;
+      padding: 5px 10px;
+      border-radius: 50px;
+    }
+    .navbar {
+      background-color: #28a745 !important;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .navbar-brand {
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .course-price {
+      font-weight: 700;
+      color: #28a745;
+    }
+    .slogan {
+      font-size: 1.2rem;
+      color: #6c757d;
+      margin-bottom: 2rem;
+    }
+    .certificate-title {
+      color: #28a745;
+      font-weight: 700;
+      margin-bottom: 2rem;
+    }
+    .certificate-text {
+      font-size: 1.2rem;
+      margin: 2rem 0;
+    }
+    .certificate-signature {
+      margin-top: 3rem;
+      border-top: 2px solid #28a745;
+      display: inline-block;
+      padding-top: 1rem;
+    }
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1100;
+    }
+    .hero-section {
+      background: linear-gradient(135deg, #28a745, #218838);
+      color: white;
+      padding: 80px 0;
+      border-radius: 15px;
+      margin-bottom: 30px;
+    }
+    .btn-animate {
+      transition: all 0.3s ease;
+    }
+    .btn-animate:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Toast Notification -->
+<div class="toast-container">
+  <div id="loginToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        <span id="toastMessage">Welcome to VCS Academy!</span>
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top shadow-lg">
+  <div class="container-fluid">
+    <a class="navbar-brand text-light fw-bold fs-3 animate__animated animate__fadeInLeft" href="#landingPage"><i class="bi bi-book-half me-2"></i>VCS Academy</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link text-light fw-semibold fs-5 animate__animated animate__fadeIn animate__delay-1s" href="#landingPage"><i class="bi bi-house-door me-1"></i> Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light fw-semibold fs-5 animate__animated animate__fadeIn animate__delay-2s" href="#dashboardPage"><i class="bi bi-grid me-1"></i> Courses</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light fw-semibold fs-5 animate__animated animate__fadeIn animate__delay-3s" href="#myCoursesPage"><i class="bi bi-collection me-1"></i> My Learning</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-light fw-semibold fs-5 animate__animated animate__fadeIn animate__delay-4s" href="#certificateSection"><i class="bi bi-award me-1"></i> Certificates</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Landing Page -->
+<div id="landingPage" class="page active-page animate__animated animate__fadeIn">
+  <div class="container py-5">
+    <div class="hero-section text-center animate__animated animate__fadeIn">
+      <h1 class="display-4 fw-bold mb-4">Welcome to VCS Learning Platform</h1>
+      <p class="slogan text-white">Empowering your future through quality education.</p>
+      <div class="d-flex gap-3 justify-content-center">
+        <button class="btn btn-light btn-lg px-4 py-2 btn-animate" onclick="showPage('dashboardPage')">
+          <i class="bi bi-grid me-2"></i>Browse Courses
+        </button>
+        <button class="btn btn-outline-light btn-lg px-4 py-2 btn-animate" onclick="showPage('certificateSection')">
+          <i class="bi bi-award me-2"></i>View Certificates
+        </button>
+      </div>
+    </div>
+    
+    <div class="row mt-5">
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center">
+            <i class="bi bi-collection text-success" style="font-size: 3rem;"></i>
+            <h3 class="mt-3">100+ Courses</h3>
+            <p>Explore our extensive catalog of courses across various disciplines.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center">
+            <i class="bi bi-award text-success" style="font-size: 3rem;"></i>
+            <h3 class="mt-3">Certificates</h3>
+            <p>Earn recognized certificates upon course completion.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center">
+            <i class="bi bi-people text-success" style="font-size: 3rem;"></i>
+            <h3 class="mt-3">Expert Instructors</h3>
+            <p>Learn from industry professionals and academic experts.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Dashboard Page -->
+<div id="dashboardPage" class="page animate__animated animate__fadeIn">
+  <div class="container py-5">
+    <h2 class="text-center mb-5 fw-bold">Explore Our Courses</h2>
+    <div class="row g-4" id="courseList"></div>
+  </div>
+</div>
+
+<!-- My Courses Page -->
+<div id="myCoursesPage" class="page animate__animated animate__fadeIn">
+  <div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5">
+      <h2 class="fw-bold">My Learning Journey</h2>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-success" onclick="filterCourses('all')">All Courses</button>
+        <button class="btn btn-outline-success" onclick="filterCourses('progress')">In Progress</button>
+        <button class="btn btn-outline-success" onclick="filterCourses('completed')">Completed</button>
+      </div>
+    </div>
+    <div class="row g-4" id="enrolledList"></div>
+  </div>
+</div>
+
+<!-- Certificate Section -->
+<div id="certificateSection" class="page animate__animated animate__fadeIn">
+  <div class="container py-5">
+    <h2 class="text-center mb-5 fw-bold">Your Achievements</h2>
+    <div id="certificate">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMTUwIDE1MCI+PHJlY3Qgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiIGZpbGw9IiNlZWVlZWUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSIgZmlsbD0iIzAwMCI+VkNTPC90ZXh0Pjwvc3ZnPg==" alt="VCS Logo" class="mb-4" style="height: 80px;">
+      <h1 class="certificate-title">Certificate of Completion</h1>
+      <p class="certificate-text">This certifies that</p>
+      <h3 id="certStudentName" class="fw-bold mb-4">Alexa</h3>
+      <p class="certificate-text">has successfully completed the course</p>
+      <h4 id="certCourseTitle" class="fw-bold mb-4">Advanced Web Development</h4>
+      <p class="certificate-text">with distinction on</p>
+      <p id="certDate" class="fw-bold">May 15, 2025</p>
+      <div class="certificate-signature">
+        <p class="mb-1">Director of Education</p>
+        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCAxNTAgNTAiPjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iNTAiIGZpbGw9IiNlZWVlZWUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjEyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSIgZmlsbD0iIzAwMCI+U2lnbmF0dXJlPC90ZXh0Pjwvc3ZnPg==" alt="Signature" style="height: 50px;">
+      </div>
+    </div>
+    <div class="text-center mt-4">
+      <button class="btn btn-success btn-lg px-4 py-2 btn-animate me-3" onclick="downloadCertificate()"><i class="bi bi-download me-2"></i>Download Certificate</button>
+      <button class="btn btn-outline-success btn-lg px-4 py-2 btn-animate" onclick="shareCertificate()"><i class="bi bi-share me-2"></i>Share Certificate</button>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="animate__animated animate__fadeInUp">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mb-4 mb-md-0">
+        <h5 class="mb-3"><i class="bi bi-book-half me-2"></i>VCS Academy</h5>
+        <p>Empowering learners worldwide with quality education since 2020.</p>
+      </div>
+      <div class="col-md-4 mb-4 mb-md-0">
+        <h5 class="mb-3">Quick Links</h5>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#landingPage" class="text-white text-decoration-none">Home</a></li>
+          <li class="mb-2"><a href="#dashboardPage" class="text-white text-decoration-none">Courses</a></li>
+          <li class="mb-2"><a href="#myCoursesPage" class="text-white text-decoration-none">My Learning</a></li>
+          <li><a href="#certificateSection" class="text-white text-decoration-none">Certificates</a></li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <h5 class="mb-3">Connect With Us</h5>
+        <a href="https://www.facebook.com" target="_blank"><i class="bi bi-facebook fs-4"></i></a>
+        <a href="https://www.twitter.com" target="_blank"><i class="bi bi-twitter fs-4"></i></a>
+        <a href="https://www.linkedin.com" target="_blank"><i class="bi bi-linkedin fs-4"></i></a>
+        <a href="https://www.instagram.com" target="_blank"><i class="bi bi-instagram fs-4"></i></a>
+        <a href="mailto:contact@vcslearning.com"><i class="bi bi-envelope-fill fs-4"></i></a>
+      </div>
+    </div>
+    <hr class="my-4 bg-light">
+    <div class="row">
+      <div class="col-md-6 mb-3 mb-md-0">
+        <p class="mb-0">&copy; 2025 VCS Academy. All rights reserved.</p>
+      </div>
+      <div class="col-md-6 text-md-end">
+        <a href="#" class="text-white text-decoration-none me-3">Privacy Policy</a>
+        <a href="#" class="text-white text-decoration-none me-3">Terms of Service</a>
+        <a href="#" class="text-white text-decoration-none">Contact Us</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Bootstrap JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- jsPDF Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+  // Initialize all variables at the top
+  const allPages = ['landingPage', 'dashboardPage', 'myCoursesPage', 'certificateSection'];
+  const courses = [
+    { 
+      name: "Web Development Bootcamp", 
+      duration: "8 weeks", 
+      price: "$99", 
+      img: "https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80", 
+      progress: 70,
+      category: "Web Development",
+      description: "Master full-stack web development with HTML, CSS, JavaScript and more"
+    },
+    { 
+      name: "Data Science Fundamentals", 
+      duration: "10 weeks", 
+      price: "$149", 
+      img: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80", 
+      progress: 50,
+      category: "Data Science",
+      description: "Learn data analysis, visualization and machine learning basics"
+    },
+    { 
+      name: "Mobile App Development", 
+      duration: "6 weeks", 
+      price: "$129", 
+      img: "https://images.unsplash.com/photo-1607252650355-f7fd0460ccdb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80", 
+      progress: 30,
+      category: "Mobile Development",
+      description: "Build cross-platform mobile apps with React Native"
+    },
+    { 
+      name: "Cloud Computing", 
+      duration: "5 weeks", 
+      price: "$119", 
+      img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1472&q=80", 
+      progress: 80,
+      category: "Cloud",
+      description: "Learn AWS, Azure and Google Cloud platform essentials"
+    },
+    { 
+      name: "Python Programming", 
+      duration: "4 weeks", 
+      price: "$89", 
+      img: "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1632&q=80", 
+      progress: 0,
+      category: "Programming",
+      description: "From beginner to advanced Python programming concepts"
+    },
+    { 
+      name: "UI/UX Design", 
+      duration: "6 weeks", 
+      price: "$109", 
+      img: "https://images.unsplash.com/photo-1541462608143-67571c6738dd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80", 
+      progress: 0,
+      category: "Design",
+      description: "Master user interface and user experience design principles"
+    },
+    { 
+      name: "Cybersecurity Essentials", 
+      duration: "8 weeks", 
+      price: "$139", 
+      img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80", 
+      progress: 0,
+      category: "Security",
+      description: "Learn to protect systems and networks from digital attacks"
+    },
+    { 
+      name: "Artificial Intelligence", 
+      duration: "12 weeks", 
+      price: "$199", 
+      img: "https://images.unsplash.com/photo-1677442135136-760c813a743e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1374&q=80", 
+      progress: 0,
+      category: "AI",
+      description: "Introduction to machine learning and neural networks"
+    }
+  ];
+  let enrolled = [
+    {...courses[0], progress: 70},
+    {...courses[1], progress: 50},
+    {...courses[2], progress: 30},
+    {...courses[3], progress: 80}
+  ];
+
+  // Initialize toast after DOM is loaded
+  document.addEventListener('DOMContentLoaded', function() {
+    const toastEl = document.getElementById('loginToast');
+    const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+    
+    // Set up event listeners
+    window.addEventListener('hashchange', handleHashChange);
+    
+    // Initialize the page
+    const pageId = window.location.hash.substring(1);
+    showPage(pageId);
+    renderCourses();
+    toast.show();
+  });
+
+  function showPage(pageId) {
+    // If no pageId provided, default to landing page
+    if (!pageId || !allPages.includes(pageId)) {
+      pageId = 'landingPage';
+    }
+    
+    // Hide all pages
+    allPages.forEach(page => {
+      document.getElementById(page).classList.remove('active-page');
+    });
+    
+    // Show the requested page
+    const pageElement = document.getElementById(pageId);
+    if (pageElement) {
+      pageElement.classList.add('active-page');
+    }
+    
+    // Update URL hash without triggering hashchange
+    if (window.location.hash !== `#${pageId}`) {
+      history.replaceState(null, null, `#${pageId}`);
+    }
+    
+    // Load appropriate content
+    if (pageId === 'dashboardPage') renderCourses();
+    if (pageId === 'myCoursesPage') renderEnrolled();
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
+  }
+
+  // Handle hash changes in URL
+  function handleHashChange() {
+    const pageId = window.location.hash.substring(1);
+    showPage(pageId);
+  }
+
+  function renderCourses() {
+    const courseList = document.getElementById("courseList");
+    if (!courseList) return;
+    
+    courseList.innerHTML = '';
+    courses.forEach((course, index) => {
+      courseList.innerHTML += `
+        <div class="col-md-6 col-lg-3">
+          <div class="card course-card h-100">
+            <div class="position-relative">
+              <img src="${course.img}" class="card-img-top course-img" alt="${course.name}">
+              <span class="badge badge-category">${course.category}</span>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">${course.name}</h5>
+              <p class="card-text text-muted">${course.description}</p>
+              <div class="d-flex justify-content-between align-items-center mt-auto">
+                <small class="text-muted"><i class="bi bi-clock"></i> ${course.duration}</small>
+                <span class="course-price fw-bold">${course.price}</span>
+              </div>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">
+              <button class="btn btn-success w-100 btn-animate" onclick="enroll(${index})">
+                <i class="bi bi-cart-plus me-2"></i>Enroll Now
+              </button>
+            </div>
+          </div>
+        </div>`;
+    });
+  }
+
+  function enroll(index) {
+    if (index < 0 || index >= courses.length) return;
+    
+    const course = courses[index];
+    if (!enrolled.some(c => c.name === course.name)) {
+      enrolled.push({...course, progress: 0});
+      
+      // Show toast notification
+      document.getElementById('toastMessage').textContent = `Successfully enrolled in ${course.name}!`;
+      const toast = bootstrap.Toast.getOrCreateInstance(document.getElementById('loginToast'));
+      toast.show();
+      
+      renderEnrolled();
+    } else {
+      // Show toast notification
+      document.getElementById('toastMessage').textContent = `You're already enrolled in ${course.name}. Continue learning!`;
+      const toast = bootstrap.Toast.getOrCreateInstance(document.getElementById('loginToast'));
+      toast.show();
+    }
+  }
+
+  function filterCourses(filterType) {
+    let filteredCourses = [];
+    switch(filterType) {
+      case 'progress':
+        filteredCourses = enrolled.filter(course => course.progress > 0 && course.progress < 100);
+        break;
+      case 'completed':
+        filteredCourses = enrolled.filter(course => course.progress >= 100);
+        break;
+      default:
+        filteredCourses = [...enrolled];
+    }
+    renderFilteredCourses(filteredCourses, filterType);
+  }
+
+  function renderFilteredCourses(filteredCourses, filterType = 'all') {
+    const enrolledList = document.getElementById("enrolledList");
+    if (!enrolledList) return;
+    
+    enrolledList.innerHTML = '';
+    
+    if (filteredCourses.length === 0) {
+      enrolledList.innerHTML = `
+        <div class="col-12 text-center py-5">
+          <div class="card shadow-sm border-0 p-5">
+            <i class="bi bi-book text-muted" style="font-size: 5rem;"></i>
+            <h4 class="text-muted mt-4">No courses found</h4>
+            <p class="text-muted mb-4">You don't have any ${filterType === 'progress' ? 'in progress' : filterType === 'completed' ? 'completed' : 'enrolled'} courses yet.</p>
+            <button class="btn btn-success btn-lg px-4 py-2 btn-animate" onclick="showPage('dashboardPage')">
+              <i class="bi bi-search me-2"></i>Explore Courses
+            </button>
+          </div>
+        </div>`;
+      return;
+    }
+    
+    filteredCourses.forEach((course, index) => {
+      const originalIndex = enrolled.findIndex(c => c.name === course.name);
+      enrolledList.innerHTML += `
+        <div class="col-md-6 col-lg-4">
+          <div class="card shadow-sm h-100">
+            <img src="${course.img}" class="card-img-top course-img" alt="${course.name}">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-3">
+                <h5 class="card-title mb-0">${course.name}</h5>
+                <span class="badge bg-success">${course.category}</span>
+              </div>
+              <p class="card-text text-muted small">${course.description}</p>
+              
+              <div class="progress-container my-4">
+                <div class="progress-circle" style="--progress:${course.progress}%"></div>
+                <div class="progress-text">${course.progress}%</div>
+              </div>
+              
+              <div class="d-flex justify-content-between align-items-center">
+                <small class="text-muted"><i class="bi bi-clock"></i> ${course.duration}</small>
+                <div class="d-flex gap-2">
+                  <button class="btn btn-sm btn-outline-success" onclick="updateProgress(${originalIndex})">
+                    <i class="bi bi-arrow-up"></i> Progress
+                  </button>
+                  ${course.progress >= 100 ? 
+                    `<button class="btn btn-sm btn-success" onclick="generateCertificate('${course.name}')">
+                      <i class="bi bi-award"></i> Certificate
+                    </button>` : 
+                    ''}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>`;
+    });
+  }
+
+  function renderEnrolled() {
+    renderFilteredCourses(enrolled);
+  }
+
+  function updateProgress(index) {
+    if (index < 0 || index >= enrolled.length) return;
+    
+    const newProgress = prompt("Update your course progress (0-100%):", enrolled[index].progress);
+    if (newProgress !== null && !isNaN(newProgress)) {
+      const progressValue = Math.min(100, Math.max(0, parseInt(newProgress)));
+      enrolled[index].progress = progressValue;
+      renderEnrolled();
+      
+      if (progressValue === 100) {
+        setTimeout(() => {
+          document.getElementById('toastMessage').textContent = `Congratulations! You've completed ${enrolled[index].name}`;
+          const toast = bootstrap.Toast.getOrCreateInstance(document.getElementById('loginToast'));
+          toast.show();
+        }, 500);
+      }
+    } else if (newProgress !== null) {
+      alert("Please enter a valid number between 0 and 100");
+    }
+  }
+
+  function generateCertificate(courseName) {
+    showPage('certificateSection');
+    document.getElementById("certCourseTitle").textContent = courseName;
+    document.getElementById("certDate").textContent = new Date().toLocaleDateString('en-US', {
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric'
+    });
+  }
+
+  function downloadCertificate() {
+    const studentName = document.getElementById("certStudentName").textContent;
+    const courseTitle = document.getElementById("certCourseTitle").textContent;
+    const date = document.getElementById("certDate").textContent;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'mm'
+    });
+    
+    // Add background
+    doc.setFillColor(240, 248, 255);
+    doc.rect(0, 0, 297, 210, 'F');
+    
+    // Add border
+    doc.setDrawColor(40, 167, 69);
+    doc.setLineWidth(5);
+    doc.rect(10, 10, 277, 190);
+    
+    // Add logo
+    doc.addImage('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNTAiIGhlaWdodD0iMTUwIiB2aWV3Qm94PSIwIDAgMTUwIDE1MCI+PHJlY3Qgd2lkdGg9IjE1MCIgaGVpZ2h0PSIxNTAiIGZpbGw9IiNlZWVlZWUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjI0IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBhbGlnbm1lbnQtYmFzZWxpbmU9Im1pZGRsZSIgZmlsbD0iIzAwMCI+VkNTPC90ZXh0Pjwvc3ZnPg==', 'JPEG', 20, 20, 30, 30);
+    
+    // Certificate title
+    doc.setFontSize(28);
+    doc.setTextColor(40, 167, 69);
+    doc.text('Certificate of Completion', 148.5, 40, { align: 'center' });
+    
+    // Main text
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text('This is to certify that', 148.5, 60, { align: 'center' });
+    
+    // Student name
+    doc.setFontSize(24);
+    doc.setTextColor(40, 167, 69);
+    doc.text(studentName, 148.5, 75, { align: 'center' });
+    
+  
+    
+    // Completion text
+    doc.setFontSize(16);
+    doc.setTextColor(0, 0, 0);
+    doc.text('has successfully completed the course', 148.5, 90, { align: 'center' });
+    
+    // Course title
+    doc.setFontSize(20);
+    doc.setTextColor(40, 167, 69);
+    doc.text(courseTitle, 148.5, 105, { align: 'center' });
+    
+    // Date
+    doc.setFontSize(14);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Completed on: ${date}`, 148.5, 120, { align: 'center' });
+    
+    // Signature
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text('________________________', 80, 160);
+    doc.text('Director of Education', 80, 170);
+    
+    doc.text('________________________', 200, 160);
+    doc.text('Date', 200, 170);
+    
+    // Footer
+    doc.setFontSize(10);
+    doc.setTextColor(150, 150, 150);
+    doc.text('VCS Academy - Empowering your future through quality education', 148.5, 195, { align: 'center' });
+    
+    doc.save(`${studentName}-${courseTitle}-Certificate.pdf`);
+  }
+
+  function shareCertificate() {
+    document.getElementById('toastMessage').textContent = 'Certificate sharing feature would be implemented here!';
+    toast.show();
+  }
+</script>
+
+</body>
+</html>
